@@ -1,4 +1,5 @@
 
+/*
 class StringPatternMatchingAlg {
 
     constructor() {
@@ -138,8 +139,152 @@ class StringPatternMatchingAlg {
     }
 }
 
-let n = new StringPatternMatchingAlg();
-n.KMP('aaaaa', 'aa');
+//let n = new StringPatternMatchingAlg();
+//n.KMP('aaaaa', 'aa');
 
+
+console.log(`------ es5 way ------`);
+
+let add = function(x) {
+    // currying to another function
+    return function(y) {
+        // x is accessed in the inner function via closure
+        return x + y;
+    }
+}
+
+let sixPlus = add(6);
+
+console.log(sixPlus(5));
+console.log(sixPlus(8));
+console.log(sixPlus(4));
+
+console.log(add(5)(4));
+console.log(add(8)(8));
+
+
+console.log(`------ es6 way ------`);
+
+let add2 = x => (y) => x + y;
+
+let eightPlus = add2(8);
+console.log(eightPlus(8));
+console.log(eightPlus(10));
+console.log(eightPlus(1));
+
+console.log(add2(4)(6));
+console.log(add2(1)(1));
+console.log(add2(0)(0));
+
+
+*/
+
+const MAXCHAR = 256;
+
+function BadHeuristic(newPattern, newText) {
+
+    this.pattern = (newPattern) ? newPattern : null;
+    this.patternLength = (this.pattern) ? this.pattern.length : 0;
+
+    this.text = (newText) ? newText : null;
+    this.textLength = (this.text) ? this.text.length : 0;
+
+    this.arrBadChar = [];
+
+    this.display = function() {
+        console.log(`--- (BadHeuristic) display info---`);
+        if (this.pattern) {
+            console.log(`pattern: ${this.pattern}, with length: ${this.patternLength}`);
+        } else {
+            console.log('please assign valid pattern');
+        }
+
+        if (this.text) {
+            console.log(`text: ${this.text}, with length: ${this.textLength}`);
+        } else {
+            console.log('please assign valid text');
+        }
+        console.log(`----------------------------------`);
+    }
+}
+
+BadHeuristic.prototype.searchPattern  = function() {
+
+    this.badCharacterHeuristic();
+    let shift = 0;
+
+    while (shift <= (this.textLength - this.patternLength)) {
+
+        let j = this.patternLength - 1;
+
+        // we calculate for a full match.
+        while( j >= 0 && this.pattern[j] == text[shift + j]) {
+            j--;
+        }
+
+        // if there is a full pattern match, j will be 0
+        // if there is a mismatch, j will be > 0
+
+        if(j < 0) { // Match
+
+            console.log(`√ match found at ${shift}`);
+
+            // are we still within the confinement of the array?
+            if ((shift + this.patternLength) < this.textLength) {
+                
+                //shift += patLen - badCharacter[mainString[shift + patLen]];
+                let indexOfChar = shift + this.patternLength;
+                let char = this.text[indexOfChar];
+                let asciiOfChar = char.charCodeAt(0);
+                shift += this.patternLength - this.arrBadChar[asciiOfChar];
+            } else {
+                shift += 1; // going forward, it will be evaluated in the beginning of the while
+            }
+
+
+        } else { // pattern mismatch
+
+            // for index of character over to the char after the mismatch. 
+            let indexOfChar = shift + j;
+
+            // then we get the character of that index
+            let char = this.text[indexOfChar];
+
+            // getting the ascii of that character, we look at the the value of that index ascii
+            let asciiOfChar = char.charCodeAt(0);
+
+            // in a 3 letter pattern, we may have 0, 1, or 2. 
+            // in the end, we shift according to the max
+            shift += Math.max(1, j - this.arrBadChar[asciiOfChar]);
+        }
+    }
+}
+
+
+// in the badChar array, the index represent the ascii
+// 1) for each ascii, let's initialize to all -1
+// 2) for each letter in the pattern, turn that letter into ascii
+// then using the ascii as an index, let's assign it to the index of the pattern where this ascii is. 
+
+BadHeuristic.prototype.badCharacterHeuristic = function() {
+    for (let i = 0; i < MAXCHAR; i++) {
+        this.arrBadChar[i] = -1;
+    }
+
+    for (let j = 0; j < this.patternLength; j++) {
+        let letter = this.pattern[j];
+        let ascii = letter.charCodeAt(0);
+        this.arrBadChar[ascii] = j;
+        console.log(`at index ${ascii}, we assign it ${j}`);
+    }
+
+    console.log(this.arrBadChar);
+}
+
+
+let bad = new BadHeuristic('dou', 'hadou ryu ken dragon paunch');
+bad.display();
+bad.badCharacterHeuristic();
+bad.searchPattern();
 
 
