@@ -218,7 +218,7 @@ BadHeuristic.prototype.searchPattern  = function() {
         let j = this.patternLength - 1;
 
         // we calculate for a full match.
-        while( j >= 0 && this.pattern[j] == text[shift + j]) {
+        while( j >= 0 && this.pattern[j] == this.text[shift + j]) {
             j--;
         }
 
@@ -229,10 +229,7 @@ BadHeuristic.prototype.searchPattern  = function() {
 
             console.log(`√ match found at ${shift}`);
 
-            // are we still within the confinement of the array?
-            if ((shift + this.patternLength) < this.textLength) {
-                
-                //shift += patLen - badCharacter[mainString[shift + patLen]];
+            if ((shift + this.patternLength) < this.textLength) { // are we still within the confinement of the array?
                 let indexOfChar = shift + this.patternLength;
                 let char = this.text[indexOfChar];
                 let asciiOfChar = char.charCodeAt(0);
@@ -270,21 +267,16 @@ BadHeuristic.prototype.badCharacterHeuristic = function() {
     for (let i = 0; i < MAXCHAR; i++) {
         this.arrBadChar[i] = -1;
     }
-
     for (let j = 0; j < this.patternLength; j++) {
         let letter = this.pattern[j];
         let ascii = letter.charCodeAt(0);
         this.arrBadChar[ascii] = j;
         console.log(`at index ${ascii}, we assign it ${j}`);
     }
-
-    console.log(this.arrBadChar);
 }
 
 
-let bad = new BadHeuristic('dou', 'hadou ryu ken dragon paunch');
-bad.display();
-bad.badCharacterHeuristic();
+let bad = new BadHeuristic('dou', 'hadou ken dougon dounch');
 bad.searchPattern();
 
 
